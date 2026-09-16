@@ -105,6 +105,15 @@ button, .link-button, .secondary-link {
   display: inline-block;
 }
 
+.ai-link {
+  background: #7c3aed;
+  color: white;
+  border-radius: 8px;
+  padding: 12px 18px;
+  text-decoration: none;
+  text-align: center;
+}
+
 button.secondary {
   background: #0f766e;
 }
@@ -244,6 +253,45 @@ select {
   justify-content: space-between;
   gap: 12px;
   margin-top: 16px;
+}
+
+.generation-form,
+.generated-content {
+  max-width: 700px;
+  margin: 20px auto;
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.generation-form label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.generation-form input {
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 12px;
+}
+
+.generated-content h2 {
+  margin-top: 0;
+}
+
+.generated-content h3 {
+  margin-bottom: 8px;
+}
+
+.hook-list {
+  padding-left: 24px;
+}
+
+.script-output {
+  white-space: pre-line;
+  line-height: 1.6;
 }
 
 @media (max-width: 700px) {

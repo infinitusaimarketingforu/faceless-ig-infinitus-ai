@@ -88,3 +88,21 @@ def test_category_emoji_is_shown():
 
         assert page.status_code == 200
         assert b"\xf0\x9f\x93\x9a" in page.data
+
+
+def test_mock_ai_generates_hooks_script_and_caption():
+    with app.test_client() as client:
+        reset_db()
+
+        client.post("/add", data={"title": "Content-Planung", "category": "Education"})
+        response = client.post(
+            "/generate/1",
+            data={"topic": "Content-Planung für Anfänger"},
+        )
+
+        assert response.status_code == 200
+        assert "3 Dinge, die du über Content-Planung für Anfänger wissen solltest".encode() in response.data
+        assert "Der häufigste Fehler bei Content-Planung für Anfänger".encode() in response.data
+        assert "So wird Content-Planung für Anfänger ganz einfach erklärt".encode() in response.data
+        assert b"Reel-Skript" in response.data
+        assert b"Caption" in response.data

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hook &amp; Caption generieren</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <div class="container">
+      <h1>Hook &amp; Caption generieren</h1>
+      <p>Idee: <strong>{{ idea['title'] }}</strong></p>
+
+      <form action="{{ url_for('generate_content', id=idea['id']) }}" method="post" class="generation-form">
+        <label for="topic">Thema für die KI</label>
+        <input id="topic" name="topic" type="text" value="{{ topic }}" placeholder="z. B. Zeitmanagement für Selbstständige" required>
+        <button type="submit">Mock-KI starten</button>
+      </form>
+
+      {% if generated %}
+        <section class="generated-content">
+          <h2>Vorschläge für: {{ topic }}</h2>
+
+          <h3>3 Hook-Vorschläge</h3>
+          <ol class="hook-list">
+            {% for hook in generated.hooks %}
+              <li>{{ hook }}</li>
+            {% endfor %}
+          </ol>
+
+          <h3>Reel-Skript</h3>
+          <p class="script-output">{{ generated.script }}</p>
+
+          <h3>Caption</h3>
+          <p>{{ generated.caption }}</p>
+        </section>
+      {% endif %}
+
+      <a href="{{ url_for('index') }}" class="secondary-link">Zurück zur Übersicht</a>
+    </div>
+  </body>
+</html>

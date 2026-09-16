@@ -14,6 +14,26 @@ CATEGORY_EMOJIS = {
 }
 
 
+def generate_mock_content(topic, category):
+    topic = topic.strip() or category
+    return {
+        "hooks": [
+            f"3 Dinge, die du über {topic} wissen solltest",
+            f"Der häufigste Fehler bei {topic}",
+            f"So wird {topic} ganz einfach erklärt",
+        ],
+        "script": (
+            f"Hook: Starte mit einer überraschenden Aussage über {topic}.\n\n"
+            f"Mehrwert: Erkläre in drei kurzen Schritten, was bei {topic} wichtig ist.\n\n"
+            "Abschluss: Bitte die Zuschauer, ihre Erfahrung zu kommentieren und dem Account zu folgen."
+        ),
+        "caption": (
+            f"{topic} verständlich erklärt: Speichere dir diese Tipps und teile das Reel "
+            "mit jemandem, dem sie helfen können."
+        ),
+    }
+
+
 def get_db_connection():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
@@ -155,6 +175,29 @@ def delete_idea(id):
     conn.commit()
     conn.close()
     return redirect(url_for("index"))
+
+
+@app.route("/generate/<int:id>", methods=["GET", "POST"])
+def generate_content(id):
+    conn = get_db_connection()
+    idea = conn.execute("SELECT * FROM ideas WHERE id = ?", (id,)).fetchone()
+    conn.close()
+
+    if idea is None:
+        return redirect(url_for("index"))
+
+    topic = idea["title"]
+    generated = None
+    if request.method == "POST":
+        topic = request.form.get("topic", "").strip() or idea["title"]
+        generated = generate_mock_content(topic, idea["category"])
+
+    return render_template(
+        "generate.html",
+        idea=idea,
+        topic=topic,
+        generated=generated,
+    )
 
 
 if __name__ == "__main__":

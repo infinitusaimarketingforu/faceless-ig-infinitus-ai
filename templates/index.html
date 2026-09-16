@@ -84,6 +84,7 @@
               </form>
 
               <div class="action-column">
+                <a href="{{ url_for('generate_content', id=idea['id']) }}" class="ai-link">Hook &amp; Caption generieren</a>
                 <a href="{{ url_for('edit_idea', id=idea['id']) }}" class="secondary-link">Bearbeiten</a>
                 <form action="{{ url_for('delete_idea', id=idea['id']) }}" method="post" class="delete-form">
                   <button type="submit" class="danger">Löschen</button>

@@ -37,14 +37,17 @@
 
       <form action="{{ url_for('add_idea') }}" method="post" class="idea-form">
         <label for="title">Neue Idee</label>
-        <div class="input-row">
+        <div class="input-row add-row">
           <input id="title" name="title" type="text" placeholder="z. B. 5 Hooks für Reels" required>
+          <input id="category" name="category" type="text" placeholder="Kategorie" value="Allgemein">
           <button type="submit">Hinzufügen</button>
         </div>
       </form>
 
       <div class="list">
-        {% if ideas %}
+        {% if search and not ideas %}
+          <p class="empty">Keine Einträge gefunden. Bitte passe deine Suche an oder füge einen neuen Eintrag hinzu.</p>
+        {% elif ideas %}
           {% for idea in ideas %}
             {% set badge_class = {
               'Neu': 'status-neutral',
@@ -56,7 +59,10 @@
             <div class="idea-card">
               <div class="idea-main">
                 <h2>{{ idea['title'] }}</h2>
-                <span class="status-badge {{ badge_class }}">{{ idea['status'] }}</span>
+                <div class="meta-row">
+                  <span class="category-pill">{{ idea['category'] }}</span>
+                  <span class="status-badge {{ badge_class }}">{{ idea['status'] }}</span>
+                </div>
               </div>
 
               <form action="{{ url_for('update_status', id=idea['id']) }}" method="post" class="status-form">
@@ -70,13 +76,16 @@
                 <button type="submit" class="secondary">Speichern</button>
               </form>
 
-              <form action="{{ url_for('delete_idea', id=idea['id']) }}" method="post" class="delete-form">
-                <button type="submit" class="danger">Löschen</button>
-              </form>
+              <div class="action-column">
+                <a href="{{ url_for('edit_idea', id=idea['id']) }}" class="secondary-link">Bearbeiten</a>
+                <form action="{{ url_for('delete_idea', id=idea['id']) }}" method="post" class="delete-form">
+                  <button type="submit" class="danger">Löschen</button>
+                </form>
+              </div>
             </div>
           {% endfor %}
         {% else %}
-          <p class="empty">Keine Ideen gefunden.</p>
+          <p class="empty">Noch keine Ideen gespeichert.</p>
         {% endif %}
       </div>
     </div>

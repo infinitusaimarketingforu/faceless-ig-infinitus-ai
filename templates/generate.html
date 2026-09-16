@@ -3,58 +3,24 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Hook &amp; Caption generieren</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>KI-Generierung | Faceless Content OS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>tailwind.config = { theme: { extend: { colors: { ink: '#07111f', panel: '#102035', cyan: '#5ee7f2', lime: '#c4f36b', coral: '#ff8b78', violet: '#aa9cff' }, fontFamily: { sans: ['Inter', 'sans-serif'] } } } };</script>
   </head>
-  <body>
-    <div class="container">
-      <h1>Content mit KI generieren</h1>
-      <p>Idee: <strong>{{ idea['title'] }}</strong></p>
-
-      <form action="{{ url_for('generate_content', id=idea['id']) }}" method="post" class="generation-form">
-        <label for="topic">Thema für die KI</label>
-        <input id="topic" name="topic" type="text" value="{{ topic }}" placeholder="z. B. Zeitmanagement für Selbstständige" required>
-        <button type="submit">3 Varianten generieren</button>
-      </form>
-
-      {% if generated %}
-        <section class="generated-content">
-          <h2>Vorschläge für: {{ topic }}</h2>
-
-          <h3>Hook- und Skriptvarianten</h3>
-          <div class="variation-grid">
-            {% for variation in generated.variations %}
-              <form action="{{ url_for('save_generated_content', id=idea['id']) }}" method="post" class="variation-card">
-                <h4>Variante {{ variation.label }}</h4>
-                <ol class="hook-list">
-                  {% for hook in variation.hooks %}
-                    <li>{{ hook }}</li>
-                    <input type="hidden" name="hooks" value="{{ hook }}">
-                  {% endfor %}
-                </ol>
-                <h4>Reel-Skript</h4>
-                <p class="script-output">{{ variation.script }}</p>
-                <input type="hidden" name="script" value="{{ variation.script }}">
-                <input type="hidden" name="caption" value="{{ generated.caption }}">
-                <input type="hidden" name="image_prompt" value="{{ generated.image_prompt }}">
-                <input type="hidden" name="video_prompt" value="{{ generated.video_prompt }}">
-                <input type="hidden" name="selected_variant" value="{{ variation.label }}">
-                <textarea name="variations" hidden>{{ generated.variations | tojson }}</textarea>
-                <button type="submit">Variante {{ variation.label }} speichern</button>
-              </form>
-            {% endfor %}
-          </div>
-
-          <h3>Caption</h3>
-          <p>{{ generated.caption }}</p>
-          <h3>Bild-Prompt</h3>
-          <p>{{ generated.image_prompt }}</p>
-          <h3>Video-Prompt</h3>
-          <p>{{ generated.video_prompt }}</p>
-        </section>
-      {% endif %}
-
-      <a href="{{ url_for('index') }}" class="secondary-link">Zurück zur Übersicht</a>
+  <body class="min-h-screen bg-ink font-sans text-slate-100">
+    <div class="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(170,156,255,.16),_transparent_34rem),radial-gradient(circle_at_top_right,_rgba(94,231,242,.1),_transparent_30rem)]">
+      <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <header class="mb-8 flex flex-col justify-between gap-5 md:flex-row md:items-end"><div><p class="mb-2 text-xs font-bold uppercase tracking-[.25em] text-violet">AI Content Lab</p><h1 class="text-4xl font-extrabold tracking-tight text-white sm:text-6xl">Hooks &amp; Skripte</h1><p class="mt-3 text-slate-400">Idee: <span class="font-semibold text-cyan">{{ idea['title'] }}</span></p></div><a href="{{ url_for('index') }}" class="rounded-xl border border-white/10 bg-white/[.06] px-4 py-3 font-bold text-slate-200 backdrop-blur-xl hover:border-cyan/40"><i class="fa-solid fa-arrow-left mr-2"></i>Zur Übersicht</a></header>
+        <form action="{{ url_for('generate_content', id=idea['id']) }}" method="post" class="mb-8 rounded-2xl border border-white/10 bg-white/[.06] p-5 shadow-2xl backdrop-blur-xl"><label for="topic" class="text-xs font-bold uppercase tracking-wider text-slate-400">Thema für die KI</label><div class="mt-3 flex flex-col gap-3 md:flex-row"><input id="topic" name="topic" type="text" value="{{ topic }}" placeholder="z. B. Zeitmanagement für Selbstständige" required class="min-w-0 flex-1 rounded-xl border border-white/10 bg-ink/70 px-4 py-3 text-white outline-none placeholder:text-slate-600 focus:border-violet"><button type="submit" class="rounded-xl bg-violet px-5 py-3 font-bold text-ink hover:bg-violet/80"><i class="fa-solid fa-wand-magic-sparkles mr-2"></i>3 Varianten generieren</button></div></form>
+        {% if generated %}
+          <section class="mb-6"><div class="mb-4 flex items-end justify-between gap-4"><div><p class="text-xs font-bold uppercase tracking-[.2em] text-cyan">A/B/C-Testing</p><h2 class="mt-1 text-2xl font-bold text-white">Wähle deine beste Variante</h2></div><span class="rounded-full border border-lime/30 bg-lime/10 px-3 py-1 text-xs font-bold text-lime">3 Optionen bereit</span></div><div class="grid gap-4 lg:grid-cols-3">{% for variation in generated.variations %}<form action="{{ url_for('save_generated_content', id=idea['id']) }}" method="post" class="flex flex-col rounded-2xl border border-white/10 bg-white/[.06] p-5 shadow-2xl backdrop-blur-xl transition hover:-translate-y-1 hover:border-violet/60"><div class="mb-4 flex items-center justify-between"><span class="flex h-10 w-10 items-center justify-center rounded-xl bg-violet text-lg font-extrabold text-ink">{{ variation.label }}</span><span class="text-xs font-bold uppercase tracking-wider text-slate-500">Variante {{ variation.label }}</span></div><h3 class="mb-2 text-sm font-bold uppercase tracking-wider text-cyan">Hooks</h3><ol class="mb-5 flex-1 list-decimal space-y-2 pl-5 text-sm leading-relaxed text-slate-200">{% for hook in variation.hooks %}<li>{{ hook }}</li><input type="hidden" name="hooks" value="{{ hook }}">{% endfor %}</ol><h3 class="mb-2 text-sm font-bold uppercase tracking-wider text-cyan">Reel-Skript</h3><p class="mb-5 whitespace-pre-line rounded-xl border border-white/10 bg-ink/50 p-3 text-sm leading-relaxed text-slate-300">{{ variation.script }}</p><input type="hidden" name="script" value="{{ variation.script }}"><input type="hidden" name="caption" value="{{ generated.caption }}"><input type="hidden" name="image_prompt" value="{{ generated.image_prompt }}"><input type="hidden" name="video_prompt" value="{{ generated.video_prompt }}"><input type="hidden" name="selected_variant" value="{{ variation.label }}"><textarea name="variations" hidden>{{ generated.variations | tojson }}</textarea><button type="submit" class="rounded-xl bg-lime px-4 py-3 font-bold text-ink hover:bg-lime/80"><i class="fa-solid fa-check mr-2"></i>Variante {{ variation.label }} speichern</button></form>{% endfor %}</div></section>
+          <section class="grid gap-4 lg:grid-cols-3"><article class="rounded-2xl border border-white/10 bg-white/[.05] p-5 backdrop-blur-xl lg:col-span-1"><h3 class="font-bold text-white"><i class="fa-solid fa-quote-left mr-2 text-cyan"></i>Caption</h3><p class="mt-3 text-sm text-slate-300">{{ generated.caption }}</p></article><article class="rounded-2xl border border-white/10 bg-white/[.05] p-5 backdrop-blur-xl"><h3 class="font-bold text-white"><i class="fa-solid fa-image mr-2 text-lime"></i>Bild-Prompt</h3><p class="mt-3 text-sm text-slate-300">{{ generated.image_prompt }}</p></article><article class="rounded-2xl border border-white/10 bg-white/[.05] p-5 backdrop-blur-xl"><h3 class="font-bold text-white"><i class="fa-solid fa-video mr-2 text-violet"></i>Video-Prompt</h3><p class="mt-3 text-sm text-slate-300">{{ generated.video_prompt }}</p></article></section>
+        {% else %}<section class="rounded-2xl border border-dashed border-white/15 bg-white/[.04] p-12 text-center"><i class="fa-solid fa-sparkles text-4xl text-violet"></i><h2 class="mt-4 text-2xl font-bold text-white">Bereit für neue Ideen?</h2><p class="mx-auto mt-2 max-w-md text-slate-400">Gib ein Thema ein und lasse drei unterschiedliche Hook- und Skriptvarianten erzeugen.</p></section>{% endif %}
+      </main>
     </div>
   </body>
 </html>

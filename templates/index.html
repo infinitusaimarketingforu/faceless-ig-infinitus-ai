@@ -3,104 +3,39 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Faceless IG Ideen</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Faceless Content OS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = { theme: { extend: { colors: { ink: '#07111f', panel: '#102035', cyan: '#5ee7f2', lime: '#c4f36b', coral: '#ff8b78', violet: '#aa9cff' }, fontFamily: { sans: ['Inter', 'sans-serif'] } } } };
+    </script>
   </head>
-  <body>
-    <div class="container">
-      <h1>Faceless IG Ideen</h1>
-
-      <div class="top-bar">
-        <form action="{{ url_for('index') }}" method="get" class="search-form">
-          <label for="search">Suche</label>
-          <div class="search-row">
-            <input id="search" name="q" type="text" value="{{ search }}" placeholder="z. B. Reels">
-            <button type="submit">Suchen</button>
-          </div>
-        </form>
-
-        <div class="filter-actions">
-          <a href="{{ url_for('index') }}" class="link-button">Alle zeigen</a>
-          <a href="{{ url_for('calendar') }}" class="link-button subtle">Content-Kalender</a>
-          {% if open_only %}
-            <a href="{{ url_for('index', q=search) }}" class="link-button subtle">Alle anzeigen</a>
-          {% else %}
-            <a href="{{ url_for('index', q=search, open_only=1) }}" class="link-button subtle">Nur offene Ideen</a>
-          {% endif %}
-        </div>
-      </div>
-
-      <div class="summary">
-        <div class="summary-card">
-          <span>Gesamt</span>
-          <strong>{{ total_count }}</strong>
-        </div>
-        {% for status, count in status_counts.items() %}
-          <div class="summary-card">
-            <span>{{ status }}</span>
-            <strong>{{ count }}</strong>
-          </div>
-        {% endfor %}
-      </div>
-
-      <form action="{{ url_for('add_idea') }}" method="post" class="idea-form">
-        <label for="title">Neue Idee</label>
-        <div class="input-row add-row">
-          <input id="title" name="title" type="text" placeholder="z. B. 5 Hooks für Reels" required>
-          <input id="category" name="category" type="text" placeholder="Kategorie" value="Allgemein">
-          <input id="scheduled_at" name="scheduled_at" type="datetime-local" aria-label="Veröffentlichungszeitpunkt">
-          <button type="submit">Hinzufügen</button>
-        </div>
-      </form>
-
-      <div class="list">
-        {% if (search or open_only) and not ideas %}
-          <p class="empty">Keine Einträge gefunden. Bitte passe deine Suche an, entferne den Filter oder füge einen neuen Eintrag hinzu.</p>
-        {% elif ideas %}
-          {% for idea in ideas %}
-            {% set badge_class = {
-              'Neu': 'status-neutral',
-              'Geplant': 'status-planned',
-              'Erstellt': 'status-created',
-              'Veröffentlicht': 'status-published'
-            }.get(idea['status'], 'status-neutral') %}
-
-            <div class="idea-card">
-              <div class="idea-main">
-                <h2>{{ idea['title'] }}</h2>
-                <div class="meta-row">
-                  <span class="category-pill">{{ category_emojis.get(idea['category'], '🗂️') }} {{ idea['category'] }}</span>
-                  <span class="status-badge {{ badge_class }}">{{ idea['status'] }}</span>
-                </div>
-                {% if idea['scheduled_at'] %}
-                  <p class="scheduled-date">Geplant für: {{ idea['scheduled_at'].replace('T', ' ') }}</p>
-                {% endif %}
-              </div>
-
-              <form action="{{ url_for('update_status', id=idea['id']) }}" method="post" class="status-form">
-                <label for="status-{{ idea['id'] }}">Status ändern</label>
-                <select id="status-{{ idea['id'] }}" name="status">
-                  <option value="Neu" {% if idea['status'] == 'Neu' %}selected{% endif %}>Neu</option>
-                  <option value="Geplant" {% if idea['status'] == 'Geplant' %}selected{% endif %}>Geplant</option>
-                  <option value="Erstellt" {% if idea['status'] == 'Erstellt' %}selected{% endif %}>Erstellt</option>
-                  <option value="Veröffentlicht" {% if idea['status'] == 'Veröffentlicht' %}selected{% endif %}>Veröffentlicht</option>
-                </select>
-                <button type="submit" class="secondary">Speichern</button>
-              </form>
-
-              <div class="action-column">
-                <a href="{{ url_for('generate_content', id=idea['id']) }}" class="ai-link">Hook &amp; Caption generieren</a>
-                <a href="{{ url_for('edit_idea', id=idea['id']) }}" class="secondary-link">Bearbeiten</a>
-                <form action="{{ url_for('delete_idea', id=idea['id']) }}" method="post" class="delete-form">
-                  <button type="submit" class="danger">Löschen</button>
-                </form>
-              </div>
-            </div>
-          {% endfor %}
-        {% else %}
-          <p class="empty">Noch keine Ideen gespeichert.</p>
-        {% endif %}
-      </div>
+  <body class="min-h-screen bg-ink font-sans text-slate-100">
+    <div class="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(94,231,242,.13),_transparent_34rem),radial-gradient(circle_at_top_right,_rgba(196,243,107,.08),_transparent_30rem)]">
+      <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <header class="mb-8 flex flex-col justify-between gap-5 md:flex-row md:items-end">
+          <div><p class="mb-2 text-xs font-bold uppercase tracking-[.25em] text-cyan">Faceless Content OS</p><h1 class="text-4xl font-extrabold tracking-tight text-white sm:text-6xl">Content-Dashboard</h1><p class="mt-3 max-w-xl text-slate-400">Ideen planen, KI-Inhalte testen und Veröffentlichungen organisieren.</p></div>
+          <a href="{{ url_for('calendar') }}" class="rounded-xl bg-lime px-4 py-3 text-center font-bold text-ink hover:-translate-y-0.5"><i class="fa-solid fa-calendar-days mr-2"></i>Content-Kalender</a>
+        </header>
+        <nav class="mb-6 flex flex-wrap gap-2 border-b border-white/10 pb-3"><a href="{{ url_for('index') }}" class="rounded-lg bg-cyan px-4 py-2 text-sm font-bold text-ink"><i class="fa-solid fa-table-columns mr-2"></i>Dashboard</a><a href="{{ url_for('calendar') }}" class="rounded-lg px-4 py-2 text-sm text-slate-400 hover:bg-white/10"><i class="fa-solid fa-calendar mr-2"></i>Kalender</a><a href="#ab-testing" class="rounded-lg px-4 py-2 text-sm text-slate-400 hover:bg-white/10"><i class="fa-solid fa-code-compare mr-2"></i>A/B-Testing</a><a href="#prompts-vault" class="rounded-lg px-4 py-2 text-sm text-slate-400 hover:bg-white/10"><i class="fa-solid fa-vault mr-2"></i>Prompts Vault</a></nav>
+        <section class="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-5"><div class="rounded-2xl border border-white/10 bg-white/[.06] p-4 backdrop-blur-xl"><p class="text-xs uppercase tracking-wider text-slate-400">Gesamt</p><strong class="mt-3 block text-3xl text-lime">{{ total_count }}</strong></div>{% for status, count in status_counts.items() %}<div class="rounded-2xl border border-white/10 bg-white/[.06] p-4 backdrop-blur-xl"><p class="text-xs uppercase tracking-wider text-slate-400">{{ status }}</p><strong class="mt-3 block text-3xl text-cyan">{{ count }}</strong></div>{% endfor %}</section>
+        <section class="mb-6 rounded-2xl border border-white/10 bg-white/[.06] p-5 backdrop-blur-xl"><div class="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-center"><div><h2 class="text-xl font-bold text-white">Neue Content-Idee</h2><p class="text-sm text-slate-400">Titel, Kategorie und Zeitpunkt festlegen.</p></div><div class="flex flex-wrap gap-2"><a href="{{ url_for('index') }}" class="rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-300">Alle</a>{% if open_only %}<a href="{{ url_for('index', q=search) }}" class="rounded-lg bg-lime px-3 py-2 text-sm font-bold text-ink">Offene anzeigen</a>{% else %}<a href="{{ url_for('index', q=search, open_only=1) }}" class="rounded-lg bg-lime px-3 py-2 text-sm font-bold text-ink">Nur offene</a>{% endif %}</div></div><form id="add-idea-form" action="{{ url_for('add_idea') }}" method="post" class="grid gap-3 md:grid-cols-[1.5fr_1fr_1fr_auto]"><input name="title" required placeholder="z. B. 5 Hooks für Reels" class="rounded-xl border border-white/10 bg-ink/70 px-4 py-3 text-white outline-none placeholder:text-slate-600 focus:border-cyan"><input name="category" value="Allgemein" placeholder="Kategorie" class="rounded-xl border border-white/10 bg-ink/70 px-4 py-3 text-white outline-none focus:border-cyan"><input name="scheduled_at" type="datetime-local" class="rounded-xl border border-white/10 bg-ink/70 px-4 py-3 text-slate-300 outline-none focus:border-cyan"><button class="rounded-xl bg-cyan px-5 py-3 font-bold text-ink"><i class="fa-solid fa-plus mr-2"></i>Hinzufügen</button></form><form action="{{ url_for('index') }}" method="get" class="mt-4 flex gap-2"><input name="q" value="{{ search }}" placeholder="Ideen oder Kategorien durchsuchen" class="min-w-0 flex-1 rounded-xl border border-white/10 bg-ink/70 px-4 py-3 text-white outline-none placeholder:text-slate-600 focus:border-cyan">{% if open_only %}<input type="hidden" name="open_only" value="1">{% endif %}<button class="rounded-xl border border-white/10 px-4 py-3 font-bold text-slate-200"><i class="fa-solid fa-magnifying-glass mr-2"></i>Suchen</button></form></section>
+        <section id="idea-list" class="grid gap-4">{% if (search or open_only) and not ideas %}<div class="rounded-2xl border border-white/10 bg-white/[.06] p-8 text-center text-slate-400">Keine Einträge gefunden.</div>{% elif ideas %}{% for idea in ideas %}{% set badge = {'Neu': 'border-slate-500/30 bg-slate-500/10 text-slate-300', 'Geplant': 'border-cyan/30 bg-cyan/10 text-cyan', 'Erstellt': 'border-lime/30 bg-lime/10 text-lime', 'Veröffentlicht': 'border-coral/30 bg-coral/10 text-coral'}.get(idea['status'], 'border-white/10 bg-white/5 text-slate-300') %}<article data-idea-card class="rounded-2xl border border-white/10 bg-white/[.06] p-5 shadow-2xl backdrop-blur-xl hover:border-cyan/40"><div class="grid gap-5 lg:grid-cols-[1.5fr_.8fr_auto] lg:items-center"><div><div class="mb-3 flex flex-wrap gap-2"><span class="rounded-full border border-cyan/20 bg-cyan/10 px-3 py-1 text-xs font-bold text-cyan">{{ category_emojis.get(idea['category'], '🗂️') }} {{ idea['category'] }}</span><span class="rounded-full border px-3 py-1 text-xs font-bold {{ badge }}">{{ idea['status'] }}</span></div><h2 class="text-xl font-bold text-white">{{ idea['title'] }}</h2>{% if idea['scheduled_at'] %}<p class="mt-2 text-sm text-slate-400"><i class="fa-regular fa-clock mr-1"></i>{{ idea['scheduled_at'].replace('T', ' ') }}</p>{% endif %}</div><form data-status-form action="{{ url_for('update_status', id=idea['id']) }}" method="post" class="grid gap-2"><label class="text-xs font-bold uppercase tracking-wider text-slate-500">Status ändern</label><select name="status" class="rounded-xl border border-white/10 bg-ink px-3 py-2 text-white"><option {% if idea['status'] == 'Neu' %}selected{% endif %}>Neu</option><option {% if idea['status'] == 'Geplant' %}selected{% endif %}>Geplant</option><option {% if idea['status'] == 'Erstellt' %}selected{% endif %}>Erstellt</option><option {% if idea['status'] == 'Veröffentlicht' %}selected{% endif %}>Veröffentlicht</option></select><button class="rounded-xl bg-lime px-3 py-2 text-sm font-bold text-ink">Status speichern</button></form><div class="flex flex-col gap-2"><button type="button" data-generate-url="{{ url_for('generate_content', id=idea['id']) }}" class="rounded-xl bg-violet px-4 py-3 font-bold text-ink"><i class="fa-solid fa-wand-magic-sparkles mr-2"></i>KI generieren</button><a href="{{ url_for('edit_idea', id=idea['id']) }}" class="rounded-xl border border-white/10 px-4 py-3 text-center font-bold text-slate-200"><i class="fa-solid fa-pen mr-2"></i>Bearbeiten</a><button type="button" data-delete-url="{{ url_for('delete_idea', id=idea['id']) }}" class="rounded-xl border border-coral/30 px-4 py-3 font-bold text-coral"><i class="fa-solid fa-trash mr-2"></i>Löschen</button></div></div></article>{% endfor %}{% else %}<div class="rounded-2xl border border-white/10 bg-white/[.06] p-8 text-center text-slate-400">Noch keine Ideen gespeichert.</div>{% endif %}</section>
+        <section id="ab-testing" class="mt-10 rounded-2xl border border-white/10 bg-white/[.04] p-5"><h2 class="text-xl font-bold text-white"><i class="fa-solid fa-code-compare mr-2 text-violet"></i>A/B-Testing</h2><p class="text-sm text-slate-400">KI generiert drei Varianten über den Button jeder Idee.</p></section><section id="prompts-vault" class="mt-4 rounded-2xl border border-white/10 bg-white/[.04] p-5"><h2 class="text-xl font-bold text-white"><i class="fa-solid fa-vault mr-2 text-lime"></i>Prompts Vault</h2><p class="text-sm text-slate-400">Gespeicherte Prompts findest du in der Bearbeiten-Ansicht.</p></section>
+      </main>
     </div>
+    <div id="generation-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-ink/80 p-4 backdrop-blur-sm"><div class="max-h-[90vh] w-full max-w-4xl overflow-auto rounded-2xl border border-white/10 bg-panel p-6"><div class="mb-4 flex items-center justify-between"><h2 class="text-2xl font-bold">KI-Generierung</h2><button id="close-modal" class="rounded-lg border border-white/10 px-3 py-2 text-slate-300">Schließen</button></div><div id="generation-result">Wird geladen ...</div></div></div>
+    <script>
+      const reloadAfter = response => { if (!response.ok) throw new Error(); window.location.reload(); };
+      document.querySelector('#add-idea-form').addEventListener('submit', event => { event.preventDefault(); fetch(event.target.action, { method: 'POST', body: new FormData(event.target) }).then(reloadAfter).catch(() => window.location.reload()); });
+      document.querySelectorAll('[data-status-form]').forEach(form => form.addEventListener('submit', event => { event.preventDefault(); fetch(form.action, { method: 'POST', body: new FormData(form) }).then(reloadAfter).catch(() => window.location.reload()); }));
+      document.querySelectorAll('[data-delete-url]').forEach(button => button.addEventListener('click', () => { if (!confirm('Diese Idee wirklich löschen?')) return; fetch(button.dataset.deleteUrl, { method: 'POST' }).then(response => { if (!response.ok) throw new Error(); button.closest('[data-idea-card]').remove(); }).catch(() => window.location.reload()); }));
+      const modal = document.querySelector('#generation-modal');
+      document.querySelectorAll('[data-generate-url]').forEach(button => button.addEventListener('click', async () => { modal.classList.remove('hidden'); modal.classList.add('flex'); const result = document.querySelector('#generation-result'); try { const response = await fetch(button.dataset.generateUrl); const parsed = new DOMParser().parseFromString(await response.text(), 'text/html'); result.innerHTML = parsed.querySelector('.generated-content')?.outerHTML || '<p>Keine Ergebnisse erhalten.</p>'; } catch { result.textContent = 'Die Generierung konnte nicht geladen werden.'; } }));
+      document.querySelector('#close-modal').addEventListener('click', () => { modal.classList.add('hidden'); modal.classList.remove('flex'); });
+    </script>
   </body>
 </html>

@@ -316,7 +316,11 @@ def calendar():
         day = idea["scheduled_at"][:10]
         calendar_days.setdefault(day, []).append(idea)
 
-    return render_template("calendar.html", calendar_days=calendar_days)
+    return render_template(
+        "calendar.html",
+        calendar_days=calendar_days,
+        category_emojis=CATEGORY_EMOJIS,
+    )
 
 
 @app.route("/generate/<int:id>", methods=["GET", "POST"])

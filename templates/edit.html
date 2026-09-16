@@ -3,66 +3,21 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Eintrag bearbeiten</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Idee bearbeiten | Faceless Content OS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>tailwind.config = { theme: { extend: { colors: { ink: '#07111f', panel: '#102035', cyan: '#5ee7f2', lime: '#c4f36b', coral: '#ff8b78', violet: '#aa9cff' }, fontFamily: { sans: ['Inter', 'sans-serif'] } } } };</script>
   </head>
-  <body>
-    <div class="container">
-      <h1>Eintrag bearbeiten</h1>
-
-      <form action="{{ url_for('edit_idea', id=idea['id']) }}" method="post" class="edit-form">
-        <label for="title">Titel</label>
-        <input id="title" name="title" type="text" value="{{ idea['title'] }}" required>
-
-        <label for="category">Kategorie</label>
-        <input id="category" name="category" type="text" value="{{ idea['category'] }}">
-
-        <label for="status">Status</label>
-        <select id="status" name="status">
-          {% for status in statuses %}
-            <option value="{{ status }}" {% if idea['status'] == status %}selected{% endif %}>{{ status }}</option>
-          {% endfor %}
-        </select>
-
-        <label for="scheduled_at">Veröffentlichungszeitpunkt</label>
-        <input id="scheduled_at" name="scheduled_at" type="datetime-local" value="{{ idea['scheduled_at'] or '' }}">
-
-        <div class="form-actions">
-          <a href="{{ url_for('index') }}" class="link-button">Zurück</a>
-          <a href="{{ url_for('generate_content', id=idea['id']) }}" class="link-button subtle">Neue KI-Texte</a>
-          <button type="submit">Änderungen speichern</button>
-        </div>
-      </form>
-
-      {% if idea['generated_script'] or idea['generated_caption'] or idea['generated_hooks'] %}
-        <section class="generated-content">
-          <h2>Gespeicherte KI-Texte</h2>
-          {% if saved_hooks %}
-            <h3>Hooks</h3>
-            <ol class="hook-list">
-              {% for hook in saved_hooks %}
-                <li>{{ hook }}</li>
-              {% endfor %}
-            </ol>
-          {% endif %}
-          {% if idea['generated_script'] %}
-            <h3>Reel-Skript</h3>
-            <p class="script-output">{{ idea['generated_script'] }}</p>
-          {% endif %}
-          {% if idea['generated_caption'] %}
-            <h3>Caption</h3>
-            <p>{{ idea['generated_caption'] }}</p>
-          {% endif %}
-          {% if idea['image_prompt'] %}
-            <h3>Bild-Prompt</h3>
-            <p>{{ idea['image_prompt'] }}</p>
-          {% endif %}
-          {% if idea['video_prompt'] %}
-            <h3>Video-Prompt</h3>
-            <p>{{ idea['video_prompt'] }}</p>
-          {% endif %}
-        </section>
-      {% endif %}
+  <body class="min-h-screen bg-ink font-sans text-slate-100">
+    <div class="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(94,231,242,.13),_transparent_34rem),radial-gradient(circle_at_top_right,_rgba(196,243,107,.08),_transparent_30rem)]">
+      <main class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+        <header class="mb-8 flex flex-col justify-between gap-5 md:flex-row md:items-end"><div><p class="mb-2 text-xs font-bold uppercase tracking-[.25em] text-cyan">Content Workspace</p><h1 class="text-4xl font-extrabold tracking-tight text-white sm:text-6xl">Idee bearbeiten</h1><p class="mt-3 text-slate-400">Passe Metadaten, Veröffentlichungszeitpunkt und gespeicherte KI-Inhalte an.</p></div><div class="flex flex-wrap gap-2"><a href="{{ url_for('index') }}" class="rounded-xl border border-white/10 bg-white/[.06] px-4 py-3 font-bold text-slate-200 hover:border-cyan/40"><i class="fa-solid fa-arrow-left mr-2"></i>Dashboard</a><a href="{{ url_for('generate_content', id=idea['id']) }}" class="rounded-xl bg-violet px-4 py-3 font-bold text-ink hover:bg-violet/80"><i class="fa-solid fa-wand-magic-sparkles mr-2"></i>Neue KI-Texte</a></div></header>
+        <form action="{{ url_for('edit_idea', id=idea['id']) }}" method="post" class="rounded-2xl border border-white/10 bg-white/[.06] p-6 shadow-2xl backdrop-blur-xl"><div class="mb-6 flex items-center gap-3 border-b border-white/10 pb-5"><span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan/10 text-xl text-cyan"><i class="fa-solid fa-sliders"></i></span><div><h2 class="text-xl font-bold text-white">Content-Einstellungen</h2><p class="text-sm text-slate-400">Die Änderungen werden direkt an dieser Idee gespeichert.</p></div></div><div class="grid gap-5 md:grid-cols-2"><div class="md:col-span-2"><label for="title" class="text-xs font-bold uppercase tracking-wider text-slate-400">Titel</label><input id="title" name="title" type="text" value="{{ idea['title'] }}" required class="mt-2 w-full rounded-xl border border-white/10 bg-ink/70 px-4 py-3 text-white outline-none focus:border-cyan"></div><div><label for="category" class="text-xs font-bold uppercase tracking-wider text-slate-400">Content-Pillar / Kategorie</label><input id="category" name="category" type="text" value="{{ idea['category'] }}" class="mt-2 w-full rounded-xl border border-white/10 bg-ink/70 px-4 py-3 text-white outline-none focus:border-cyan"></div><div><label for="status" class="text-xs font-bold uppercase tracking-wider text-slate-400">Status</label><select id="status" name="status" class="mt-2 w-full rounded-xl border border-white/10 bg-ink px-4 py-3 text-white outline-none focus:border-cyan">{% for status in statuses %}<option value="{{ status }}" {% if idea['status'] == status %}selected{% endif %}>{{ status }}</option>{% endfor %}</select></div><div class="md:col-span-2"><label for="scheduled_at" class="text-xs font-bold uppercase tracking-wider text-slate-400">Veröffentlichungszeitpunkt</label><input id="scheduled_at" name="scheduled_at" type="datetime-local" value="{{ idea['scheduled_at'] or '' }}" class="mt-2 w-full rounded-xl border border-white/10 bg-ink/70 px-4 py-3 text-slate-300 outline-none focus:border-cyan"></div></div><div class="mt-6 flex flex-col-reverse justify-end gap-3 border-t border-white/10 pt-5 sm:flex-row"><a href="{{ url_for('index') }}" class="rounded-xl border border-white/10 px-5 py-3 text-center font-bold text-slate-300 hover:bg-white/10">Abbrechen</a><button type="submit" class="rounded-xl bg-cyan px-5 py-3 font-bold text-ink hover:bg-cyan/80"><i class="fa-solid fa-floppy-disk mr-2"></i>Änderungen speichern</button></div></form>
+        {% if idea['generated_script'] or idea['generated_caption'] or idea['generated_hooks'] %}<section class="mt-8"><div class="mb-4"><p class="text-xs font-bold uppercase tracking-[.2em] text-lime">Prompts Vault</p><h2 class="mt-1 text-2xl font-bold text-white">Gespeicherte KI-Texte</h2></div><div class="grid gap-4 lg:grid-cols-2">{% if saved_hooks %}<article class="rounded-2xl border border-white/10 bg-white/[.06] p-5 shadow-2xl backdrop-blur-xl"><h3 class="font-bold text-white"><i class="fa-solid fa-bolt mr-2 text-lime"></i>Hooks</h3><ol class="mt-4 list-decimal space-y-2 pl-5 text-slate-300">{% for hook in saved_hooks %}<li>{{ hook }}</li>{% endfor %}</ol></article>{% endif %}{% if idea['generated_script'] %}<article class="rounded-2xl border border-white/10 bg-white/[.06] p-5 shadow-2xl backdrop-blur-xl"><h3 class="font-bold text-white"><i class="fa-solid fa-film mr-2 text-cyan"></i>Reel-Skript</h3><p class="mt-4 whitespace-pre-line text-sm leading-relaxed text-slate-300">{{ idea['generated_script'] }}</p></article>{% endif %}{% if idea['generated_caption'] %}<article class="rounded-2xl border border-white/10 bg-white/[.06] p-5 shadow-2xl backdrop-blur-xl"><h3 class="font-bold text-white"><i class="fa-solid fa-quote-left mr-2 text-violet"></i>Caption</h3><p class="mt-4 text-sm leading-relaxed text-slate-300">{{ idea['generated_caption'] }}</p></article>{% endif %}{% if idea['image_prompt'] %}<article class="rounded-2xl border border-white/10 bg-white/[.06] p-5 shadow-2xl backdrop-blur-xl"><h3 class="font-bold text-white"><i class="fa-solid fa-image mr-2 text-lime"></i>Bild-Prompt</h3><p class="mt-4 text-sm leading-relaxed text-slate-300">{{ idea['image_prompt'] }}</p></article>{% endif %}{% if idea['video_prompt'] %}<article class="rounded-2xl border border-white/10 bg-white/[.06] p-5 shadow-2xl backdrop-blur-xl"><h3 class="font-bold text-white"><i class="fa-solid fa-video mr-2 text-violet"></i>Video-Prompt</h3><p class="mt-4 text-sm leading-relaxed text-slate-300">{{ idea['video_prompt'] }}</p></article>{% endif %}</div></section>{% else %}<section class="mt-8 rounded-2xl border border-dashed border-white/15 bg-white/[.04] p-8 text-center"><i class="fa-solid fa-vault text-3xl text-lime"></i><h2 class="mt-3 text-xl font-bold text-white">Noch keine KI-Inhalte gespeichert</h2><p class="mt-2 text-slate-400">Erzeuge auf der KI-Seite Varianten und speichere deine beste Auswahl hier.</p><a href="{{ url_for('generate_content', id=idea['id']) }}" class="mt-5 inline-flex rounded-xl bg-violet px-4 py-3 font-bold text-ink"><i class="fa-solid fa-wand-magic-sparkles mr-2"></i>KI-Inhalte erzeugen</a></section>{% endif %}
+      </main>
     </div>
   </body>
 </html>

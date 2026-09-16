@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Faceless IG Ideen</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <div class="container">
+      <h1>Faceless IG Ideen</h1>
+
+      <form action="{{ url_for('add_idea') }}" method="post" class="idea-form">
+        <label for="title">Neue Idee</label>
+        <div class="input-row">
+          <input id="title" name="title" type="text" placeholder="z. B. 5 Hooks für Reels" required>
+          <button type="submit">Hinzufügen</button>
+        </div>
+      </form>
+
+      <div class="list">
+        {% if ideas %}
+          {% for idea in ideas %}
+            <div class="idea-card">
+              <div class="idea-main">
+                <h2>{{ idea['title'] }}</h2>
+                <p>Status: {{ idea['status'] }}</p>
+              </div>
+
+              <form action="{{ url_for('update_status', id=idea['id']) }}" method="post" class="status-form">
+                <label for="status-{{ idea['id'] }}">Status ändern</label>
+                <select id="status-{{ idea['id'] }}" name="status">
+                  <option value="Neu" {% if idea['status'] == 'Neu' %}selected{% endif %}>Neu</option>
+                  <option value="Geplant" {% if idea['status'] == 'Geplant' %}selected{% endif %}>Geplant</option>
+                  <option value="Erstellt" {% if idea['status'] == 'Erstellt' %}selected{% endif %}>Erstellt</option>
+                  <option value="Veröffentlicht" {% if idea['status'] == 'Veröffentlicht' %}selected{% endif %}>Veröffentlicht</option>
+                </select>
+                <button type="submit" class="secondary">Speichern</button>
+              </form>
+
+              <form action="{{ url_for('delete_idea', id=idea['id']) }}" method="post" class="delete-form">
+                <button type="submit" class="danger">Löschen</button>
+              </form>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p class="empty">Noch keine Ideen gespeichert.</p>
+        {% endif %}
+      </div>
+    </div>
+  </body>
+</html>

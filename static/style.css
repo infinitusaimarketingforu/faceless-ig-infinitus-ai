@@ -1,0 +1,113 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f7fb;
+  margin: 0;
+  color: #1f2937;
+}
+
+.container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 24px;
+}
+
+h1 {
+  margin-bottom: 24px;
+}
+
+.idea-form {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 24px;
+}
+
+.input-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+input, select, button {
+  font-size: 16px;
+}
+
+input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+}
+
+button {
+  border: none;
+  border-radius: 8px;
+  padding: 12px 18px;
+  cursor: pointer;
+  background: #2563eb;
+  color: white;
+}
+
+button.secondary {
+  background: #0f766e;
+}
+
+button.danger {
+  background: #dc2626;
+}
+
+.list {
+  display: grid;
+  gap: 16px;
+}
+
+.idea-card {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr auto;
+  align-items: center;
+  gap: 16px;
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.idea-main h2 {
+  margin: 0 0 8px 0;
+  font-size: 1.2rem;
+}
+
+.idea-main p {
+  margin: 0;
+  color: #4b5563;
+}
+
+.status-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+select {
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+}
+
+.empty {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+@media (max-width: 700px) {
+  .idea-card {
+    grid-template-columns: 1fr;
+  }
+
+  .input-row {
+    flex-direction: column;
+  }
+}

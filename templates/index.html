@@ -21,6 +21,7 @@
 
         <div class="filter-actions">
           <a href="{{ url_for('index') }}" class="link-button">Alle zeigen</a>
+          <a href="{{ url_for('calendar') }}" class="link-button subtle">Content-Kalender</a>
           {% if open_only %}
             <a href="{{ url_for('index', q=search) }}" class="link-button subtle">Alle anzeigen</a>
           {% else %}
@@ -47,6 +48,7 @@
         <div class="input-row add-row">
           <input id="title" name="title" type="text" placeholder="z. B. 5 Hooks für Reels" required>
           <input id="category" name="category" type="text" placeholder="Kategorie" value="Allgemein">
+          <input id="scheduled_at" name="scheduled_at" type="datetime-local" aria-label="Veröffentlichungszeitpunkt">
           <button type="submit">Hinzufügen</button>
         </div>
       </form>
@@ -70,6 +72,9 @@
                   <span class="category-pill">{{ category_emojis.get(idea['category'], '🗂️') }} {{ idea['category'] }}</span>
                   <span class="status-badge {{ badge_class }}">{{ idea['status'] }}</span>
                 </div>
+                {% if idea['scheduled_at'] %}
+                  <p class="scheduled-date">Geplant für: {{ idea['scheduled_at'].replace('T', ' ') }}</p>
+                {% endif %}
               </div>
 
               <form action="{{ url_for('update_status', id=idea['id']) }}" method="post" class="status-form">

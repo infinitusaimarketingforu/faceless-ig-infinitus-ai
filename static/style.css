@@ -212,6 +212,75 @@ button.danger {
   align-items: stretch;
 }
 
+.scheduled-date {
+  margin: 10px 0 0;
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+.variation-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.variation-card {
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  padding: 16px;
+  background: #f8fbff;
+}
+
+.variation-card h4 {
+  margin-top: 0;
+}
+
+.variation-card button {
+  width: 100%;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.calendar-header h1 {
+  margin-bottom: 8px;
+}
+
+.calendar-list {
+  display: grid;
+  gap: 20px;
+}
+
+.calendar-day {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.calendar-day h2 {
+  margin-top: 0;
+}
+
+.calendar-item {
+  display: grid;
+  grid-template-columns: 150px 1fr 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid #e5e7eb;
+}
+
+.calendar-item time,
+.calendar-item span {
+  color: #475569;
+}
+
 select {
   padding: 10px;
   border: 1px solid #d1d5db;
@@ -303,11 +372,17 @@ select {
   .idea-card,
   .input-row,
   .search-row,
-  .form-actions {
+  .form-actions,
+  .calendar-header {
     flex-direction: column;
   }
 
   .idea-card {
     display: block;
+  }
+
+  .variation-grid,
+  .calendar-item {
+    grid-template-columns: 1fr;
   }
 }

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Content-Kalender</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <div class="container">
+      <div class="calendar-header">
+        <div>
+          <h1>Content-Kalender</h1>
+          <p>Geplante Ideen nach Veröffentlichungszeitpunkt</p>
+        </div>
+        <a href="{{ url_for('index') }}" class="secondary-link">Zur Übersicht</a>
+      </div>
+
+      {% if calendar_days %}
+        <div class="calendar-list">
+          {% for day, ideas in calendar_days.items() %}
+            <section class="calendar-day">
+              <h2>{{ day }}</h2>
+              {% for idea in ideas %}
+                <article class="calendar-item">
+                  <time>{{ idea['scheduled_at'].replace('T', ' ') }}</time>
+                  <strong>{{ idea['title'] }}</strong>
+                  <span>{{ idea['category'] }} · {{ idea['status'] }}</span>
+                  <a href="{{ url_for('edit_idea', id=idea['id']) }}" class="secondary-link">Öffnen</a>
+                </article>
+              {% endfor %}
+            </section>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="empty">Noch keine Ideen sind terminiert. Lege im Dashboard einen Veröffentlichungszeitpunkt fest.</p>
+      {% endif %}
+    </div>
+  </body>
+</html>

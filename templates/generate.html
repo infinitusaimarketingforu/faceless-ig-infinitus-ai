@@ -8,40 +8,49 @@
   </head>
   <body>
     <div class="container">
-      <h1>Hook &amp; Caption generieren</h1>
+      <h1>Content mit KI generieren</h1>
       <p>Idee: <strong>{{ idea['title'] }}</strong></p>
 
       <form action="{{ url_for('generate_content', id=idea['id']) }}" method="post" class="generation-form">
         <label for="topic">Thema für die KI</label>
         <input id="topic" name="topic" type="text" value="{{ topic }}" placeholder="z. B. Zeitmanagement für Selbstständige" required>
-        <button type="submit">Mock-KI starten</button>
+        <button type="submit">3 Varianten generieren</button>
       </form>
 
       {% if generated %}
         <section class="generated-content">
           <h2>Vorschläge für: {{ topic }}</h2>
 
-          <h3>3 Hook-Vorschläge</h3>
-          <ol class="hook-list">
-            {% for hook in generated.hooks %}
-              <li>{{ hook }}</li>
+          <h3>Hook- und Skriptvarianten</h3>
+          <div class="variation-grid">
+            {% for variation in generated.variations %}
+              <form action="{{ url_for('save_generated_content', id=idea['id']) }}" method="post" class="variation-card">
+                <h4>Variante {{ variation.label }}</h4>
+                <ol class="hook-list">
+                  {% for hook in variation.hooks %}
+                    <li>{{ hook }}</li>
+                    <input type="hidden" name="hooks" value="{{ hook }}">
+                  {% endfor %}
+                </ol>
+                <h4>Reel-Skript</h4>
+                <p class="script-output">{{ variation.script }}</p>
+                <input type="hidden" name="script" value="{{ variation.script }}">
+                <input type="hidden" name="caption" value="{{ generated.caption }}">
+                <input type="hidden" name="image_prompt" value="{{ generated.image_prompt }}">
+                <input type="hidden" name="video_prompt" value="{{ generated.video_prompt }}">
+                <input type="hidden" name="selected_variant" value="{{ variation.label }}">
+                <textarea name="variations" hidden>{{ generated.variations | tojson }}</textarea>
+                <button type="submit">Variante {{ variation.label }} speichern</button>
+              </form>
             {% endfor %}
-          </ol>
-
-          <h3>Reel-Skript</h3>
-          <p class="script-output">{{ generated.script }}</p>
+          </div>
 
           <h3>Caption</h3>
           <p>{{ generated.caption }}</p>
-
-          <form action="{{ url_for('save_generated_content', id=idea['id']) }}" method="post" class="form-actions">
-            {% for hook in generated.hooks %}
-              <input type="hidden" name="hooks" value="{{ hook }}">
-            {% endfor %}
-            <input type="hidden" name="script" value="{{ generated.script }}">
-            <input type="hidden" name="caption" value="{{ generated.caption }}">
-            <button type="submit">Diese Hooks &amp; Caption übernehmen</button>
-          </form>
+          <h3>Bild-Prompt</h3>
+          <p>{{ generated.image_prompt }}</p>
+          <h3>Video-Prompt</h3>
+          <p>{{ generated.video_prompt }}</p>
         </section>
       {% endif %}
 

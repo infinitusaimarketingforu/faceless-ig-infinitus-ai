@@ -17,26 +17,69 @@ CATEGORY_EMOJIS = {
     "Lifestyle": "🏡",
     "Allgemein": "🗂️",
 }
+AI_VARIANT_LABELS = ["A", "B", "C"]
 
 load_dotenv()
 
 
 def generate_mock_content(topic, category):
     topic = topic.strip() or category
+    variations = [
+        {
+            "label": "A",
+            "hooks": [
+                f"3 Dinge, die du über {topic} wissen solltest",
+                f"Der häufigste Fehler bei {topic}",
+                f"So wird {topic} ganz einfach erklärt",
+            ],
+            "script": (
+                f"Hook: Starte mit einer überraschenden Aussage über {topic}.\n\n"
+                f"Mehrwert: Erkläre in drei kurzen Schritten, was bei {topic} wichtig ist.\n\n"
+                "Abschluss: Bitte die Zuschauer, ihre Erfahrung zu kommentieren und dem Account zu folgen."
+            ),
+        },
+        {
+            "label": "B",
+            "hooks": [
+                f"Was dir niemand über {topic} erzählt",
+                f"Mit diesem Tipp gelingt {topic} schneller",
+                f"Stopp: Machst du diesen Fehler bei {topic}?",
+            ],
+            "script": (
+                f"Hook: Stelle eine direkte Frage zu {topic}.\n\n"
+                f"Mehrwert: Zeige einen praktischen Tipp und ein kurzes Beispiel zu {topic}.\n\n"
+                "Abschluss: Lade die Zuschauer ein, den Tipp heute auszuprobieren."
+            ),
+        },
+        {
+            "label": "C",
+            "hooks": [
+                f"Die 30-Sekunden-Methode für {topic}",
+                f"Einfacher als gedacht: {topic}",
+                f"3 Schritte, mit denen du bei {topic} startest",
+            ],
+            "script": (
+                f"Hook: Beginne mit einem schnellen Vorher-Nachher-Vergleich zu {topic}.\n\n"
+                f"Mehrwert: Führe drei klare Schritte für {topic} vor.\n\n"
+                "Abschluss: Bitte um ein Speichern des Reels und einen Kommentar."
+            ),
+        },
+    ]
     return {
-        "hooks": [
-            f"3 Dinge, die du über {topic} wissen solltest",
-            f"Der häufigste Fehler bei {topic}",
-            f"So wird {topic} ganz einfach erklärt",
-        ],
-        "script": (
-            f"Hook: Starte mit einer überraschenden Aussage über {topic}.\n\n"
-            f"Mehrwert: Erkläre in drei kurzen Schritten, was bei {topic} wichtig ist.\n\n"
-            "Abschluss: Bitte die Zuschauer, ihre Erfahrung zu kommentieren und dem Account zu folgen."
-        ),
+        "variations": variations,
+        "hooks": variations[0]["hooks"],
+        "script": variations[0]["script"],
         "caption": (
             f"{topic} verständlich erklärt: Speichere dir diese Tipps und teile das Reel "
             "mit jemandem, dem sie helfen können."
+        ),
+        "image_prompt": (
+            f"Cinematic Instagram visual about {topic}, clean composition, bold subject, "
+            "vertical 9:16, high detail, no text"
+        ),
+        "video_prompt": (
+            f"Vertical 9:16 faceless reel about {topic}, dynamic close-ups, smooth camera motion, "
+            "modern social media style, 5 seconds"
         ),
     }
 
@@ -50,8 +93,8 @@ Thema: {topic}
 Kategorie: {category}
 
 Antworte ausschließlich als gültiges JSON mit genau diesen Schlüsseln:
-{{"hooks": ["Hook 1", "Hook 2", "Hook 3"], "script": "Reel-Skript", "caption": "Caption"}}
-Die Liste hooks muss genau drei kurze Vorschläge enthalten.
+{{"variations": [{{"label": "A", "hooks": ["Hook 1", "Hook 2", "Hook 3"], "script": "Skript A"}}, {{"label": "B", "hooks": ["Hook 1", "Hook 2", "Hook 3"], "script": "Skript B"}}, {{"label": "C", "hooks": ["Hook 1", "Hook 2", "Hook 3"], "script": "Skript C"}}], "caption": "Caption", "image_prompt": "Bildprompt", "video_prompt": "Videoprompt"}}
+Erzeuge genau drei unterschiedliche Varianten A, B und C. Jede Variante muss genau drei Hooks und ein eigenes Skript enthalten.
 """
     response = client.models.generate_content(
         model="gemini-2.5-flash",
@@ -63,12 +106,24 @@ Die Liste hooks muss genau drei kurze Vorschläge enthalten.
     result = json.loads(text)
 
     if (
-        not isinstance(result.get("hooks"), list)
-        or len(result["hooks"]) != 3
-        or not result.get("script")
+        not isinstance(result.get("variations"), list)
+        or len(result["variations"]) != 3
         or not result.get("caption")
+        or not result.get("image_prompt")
+        or not result.get("video_prompt")
     ):
         raise ValueError("Gemini-Antwort hat nicht das erwartete Format.")
+
+    for variation in result["variations"]:
+        if (
+            not isinstance(variation.get("hooks"), list)
+            or len(variation["hooks"]) != 3
+            or not variation.get("script")
+        ):
+            raise ValueError("Gemini-Variante hat nicht das erwartete Format.")
+
+    result["hooks"] = result["variations"][0]["hooks"]
+    result["script"] = result["variations"][0]["script"]
 
     return result
 
@@ -117,7 +172,16 @@ def init_db():
             conn.execute(
                 "ALTER TABLE ideas ADD COLUMN category TEXT NOT NULL DEFAULT 'Allgemein'"
             )
-        for column in ("generated_hooks", "generated_script", "generated_caption"):
+        for column in (
+            "generated_hooks",
+            "generated_script",
+            "generated_caption",
+            "image_prompt",
+            "video_prompt",
+            "generated_variations",
+            "selected_variant",
+            "scheduled_at",
+        ):
             if column not in columns:
                 conn.execute(f"ALTER TABLE ideas ADD COLUMN {column} TEXT")
 
@@ -147,13 +211,7 @@ def index():
         query += " WHERE " + " AND ".join(where_clauses)
 
     query += """
-        ORDER BY CASE status
-            WHEN 'Neu' THEN 0
-            WHEN 'Geplant' THEN 1
-            WHEN 'Erstellt' THEN 2
-            WHEN 'Veröffentlicht' THEN 3
-            ELSE 4
-        END ASC, created_at DESC
+        ORDER BY scheduled_at IS NULL ASC, scheduled_at ASC, created_at DESC
     """
 
     ideas = conn.execute(query, params).fetchall()
@@ -178,11 +236,12 @@ def index():
 def add_idea():
     title = request.form.get("title", "").strip()
     category = request.form.get("category", "Allgemein").strip() or "Allgemein"
+    scheduled_at = request.form.get("scheduled_at", "").strip() or None
     if title:
         conn = get_db_connection()
         conn.execute(
-            "INSERT INTO ideas (title, category, status) VALUES (?, ?, 'Neu')",
-            (title, category),
+            "INSERT INTO ideas (title, category, status, scheduled_at) VALUES (?, ?, 'Neu', ?)",
+            (title, category, scheduled_at),
         )
         conn.commit()
         conn.close()
@@ -197,11 +256,12 @@ def edit_idea(id):
         title = request.form.get("title", "").strip()
         category = request.form.get("category", "Allgemein").strip() or "Allgemein"
         status = request.form.get("status", "Neu")
+        scheduled_at = request.form.get("scheduled_at", "").strip() or None
 
         if title:
             conn.execute(
-                "UPDATE ideas SET title = ?, category = ?, status = ? WHERE id = ?",
-                (title, category, status, id),
+                "UPDATE ideas SET title = ?, category = ?, status = ?, scheduled_at = ? WHERE id = ?",
+                (title, category, status, scheduled_at, id),
             )
             conn.commit()
         conn.close()
@@ -243,6 +303,22 @@ def delete_idea(id):
     return redirect(url_for("index"))
 
 
+@app.route("/calendar")
+def calendar():
+    conn = get_db_connection()
+    ideas = conn.execute(
+        "SELECT * FROM ideas WHERE scheduled_at IS NOT NULL ORDER BY scheduled_at ASC"
+    ).fetchall()
+    conn.close()
+
+    calendar_days = {}
+    for idea in ideas:
+        day = idea["scheduled_at"][:10]
+        calendar_days.setdefault(day, []).append(idea)
+
+    return render_template("calendar.html", calendar_days=calendar_days)
+
+
 @app.route("/generate/<int:id>", methods=["GET", "POST"])
 def generate_content(id):
     conn = get_db_connection()
@@ -271,18 +347,37 @@ def save_generated_content(id):
     hooks = request.form.getlist("hooks")
     script = request.form.get("script", "").strip()
     caption = request.form.get("caption", "").strip()
+    image_prompt = request.form.get("image_prompt", "").strip()
+    video_prompt = request.form.get("video_prompt", "").strip()
+    selected_variant = request.form.get("selected_variant", "A").strip()
+    variations_json = request.form.get("variations", "[]")
 
-    if len(hooks) != 3 or not script or not caption:
+    if len(hooks) != 3 or not script or not caption or not image_prompt or not video_prompt:
         return redirect(url_for("generate_content", id=id))
+
+    try:
+        variations = json.loads(variations_json)
+    except json.JSONDecodeError:
+        variations = []
 
     conn = get_db_connection()
     conn.execute(
         """
         UPDATE ideas
-        SET generated_hooks = ?, generated_script = ?, generated_caption = ?
+        SET generated_hooks = ?, generated_script = ?, generated_caption = ?,
+            image_prompt = ?, video_prompt = ?, generated_variations = ?, selected_variant = ?
         WHERE id = ?
         """,
-        (json.dumps(hooks, ensure_ascii=False), script, caption, id),
+        (
+            json.dumps(hooks, ensure_ascii=False),
+            script,
+            caption,
+            image_prompt,
+            video_prompt,
+            json.dumps(variations, ensure_ascii=False),
+            selected_variant,
+            id,
+        ),
     )
     conn.commit()
     conn.close()

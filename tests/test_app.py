@@ -127,6 +127,10 @@ def test_generated_content_can_be_saved_and_shown_in_edit_view(monkeypatch):
                 "hooks": ["Hook A", "Hook B", "Hook C"],
                 "script": "Ein gespeichertes Reel-Skript.",
                 "caption": "Eine gespeicherte Caption.",
+                "image_prompt": "Ein gespeicherter Bildprompt.",
+                "video_prompt": "Ein gespeicherter Videoprompt.",
+                "selected_variant": "B",
+                "variations": "[]",
             },
         )
 
@@ -138,3 +142,41 @@ def test_generated_content_can_be_saved_and_shown_in_edit_view(monkeypatch):
         assert b"Hook C" in edit_page.data
         assert b"Ein gespeichertes Reel-Skript." in edit_page.data
         assert b"Eine gespeicherte Caption." in edit_page.data
+        assert b"Ein gespeicherter Bildprompt." in edit_page.data
+        assert b"Ein gespeicherter Videoprompt." in edit_page.data
+
+
+def test_mock_ai_returns_three_variations_and_prompts(monkeypatch):
+    with app.test_client() as client:
+        reset_db()
+        monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+
+        client.post("/add", data={"title": "Produktivität", "category": "Education"})
+        response = client.post("/generate/1", data={"topic": "Produktivität"})
+
+        assert response.status_code == 200
+        assert response.data.count(b"Variante ") >= 3
+        assert b"Bild-Prompt" in response.data
+        assert b"Video-Prompt" in response.data
+        assert b"Variante B speichern" in response.data
+
+
+def test_calendar_sorts_ideas_by_scheduled_time():
+    with app.test_client() as client:
+        reset_db()
+
+        client.post(
+            "/add",
+            data={"title": "Später geplant", "category": "Sales", "scheduled_at": "2026-10-20T18:00"},
+        )
+        client.post(
+            "/add",
+            data={"title": "Früher geplant", "category": "Education", "scheduled_at": "2026-10-05T09:00"},
+        )
+
+        calendar_page = client.get("/calendar")
+
+        assert calendar_page.status_code == 200
+        assert calendar_page.data.index("Früher geplant".encode()) < calendar_page.data.index("Später geplant".encode())
+        dashboard_page = client.get("/")
+        assert dashboard_page.data.index("Früher geplant".encode()) < dashboard_page.data.index("Später geplant".encode())

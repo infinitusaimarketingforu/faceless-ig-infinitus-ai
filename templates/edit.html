@@ -24,6 +24,9 @@
           {% endfor %}
         </select>
 
+        <label for="scheduled_at">Veröffentlichungszeitpunkt</label>
+        <input id="scheduled_at" name="scheduled_at" type="datetime-local" value="{{ idea['scheduled_at'] or '' }}">
+
         <div class="form-actions">
           <a href="{{ url_for('index') }}" class="link-button">Zurück</a>
           <a href="{{ url_for('generate_content', id=idea['id']) }}" class="link-button subtle">Neue KI-Texte</a>
@@ -49,6 +52,14 @@
           {% if idea['generated_caption'] %}
             <h3>Caption</h3>
             <p>{{ idea['generated_caption'] }}</p>
+          {% endif %}
+          {% if idea['image_prompt'] %}
+            <h3>Bild-Prompt</h3>
+            <p>{{ idea['image_prompt'] }}</p>
+          {% endif %}
+          {% if idea['video_prompt'] %}
+            <h3>Video-Prompt</h3>
+            <p>{{ idea['video_prompt'] }}</p>
           {% endif %}
         </section>
       {% endif %}

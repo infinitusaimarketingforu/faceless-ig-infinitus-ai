@@ -82,6 +82,16 @@ def generate_ai_content(topic, category):
         return generate_gemini_content(topic, category, api_key)
     except Exception:
         return generate_mock_content(topic, category)
+
+
+def get_saved_hooks(idea):
+    try:
+        hooks = json.loads(idea["generated_hooks"] or "[]")
+    except (TypeError, json.JSONDecodeError):
+        return []
+    return hooks if isinstance(hooks, list) else []
+
+
 def get_db_connection():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
@@ -107,6 +117,9 @@ def init_db():
             conn.execute(
                 "ALTER TABLE ideas ADD COLUMN category TEXT NOT NULL DEFAULT 'Allgemein'"
             )
+        for column in ("generated_hooks", "generated_script", "generated_caption"):
+            if column not in columns:
+                conn.execute(f"ALTER TABLE ideas ADD COLUMN {column} TEXT")
 
 
 init_db()
@@ -200,7 +213,12 @@ def edit_idea(id):
     if idea is None:
         return redirect(url_for("index"))
 
-    return render_template("edit.html", idea=idea, statuses=STATUS_ORDER)
+    return render_template(
+        "edit.html",
+        idea=idea,
+        statuses=STATUS_ORDER,
+        saved_hooks=get_saved_hooks(idea),
+    )
 
 
 @app.route("/update_status/<int:id>", methods=["POST"])
@@ -246,6 +264,29 @@ def generate_content(id):
         topic=topic,
         generated=generated,
     )
+
+
+@app.route("/save-generated/<int:id>", methods=["POST"])
+def save_generated_content(id):
+    hooks = request.form.getlist("hooks")
+    script = request.form.get("script", "").strip()
+    caption = request.form.get("caption", "").strip()
+
+    if len(hooks) != 3 or not script or not caption:
+        return redirect(url_for("generate_content", id=id))
+
+    conn = get_db_connection()
+    conn.execute(
+        """
+        UPDATE ideas
+        SET generated_hooks = ?, generated_script = ?, generated_caption = ?
+        WHERE id = ?
+        """,
+        (json.dumps(hooks, ensure_ascii=False), script, caption, id),
+    )
+    conn.commit()
+    conn.close()
+    return redirect(url_for("edit_idea", id=id))
 
 
 if __name__ == "__main__":

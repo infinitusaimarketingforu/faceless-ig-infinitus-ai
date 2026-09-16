@@ -107,3 +107,34 @@ def test_mock_ai_generates_hooks_script_and_caption(monkeypatch):
         assert "So wird Content-Planung für Anfänger ganz einfach erklärt".encode() in response.data
         assert b"Reel-Skript" in response.data
         assert b"Caption" in response.data
+
+
+def test_generated_content_can_be_saved_and_shown_in_edit_view(monkeypatch):
+    with app.test_client() as client:
+        reset_db()
+        monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+
+        client.post("/add", data={"title": "Sommer-Reels", "category": "Lifestyle"})
+        generated = client.post(
+            "/generate/1",
+            data={"topic": "Sommer-Reels"},
+        )
+        assert generated.status_code == 200
+
+        saved = client.post(
+            "/save-generated/1",
+            data={
+                "hooks": ["Hook A", "Hook B", "Hook C"],
+                "script": "Ein gespeichertes Reel-Skript.",
+                "caption": "Eine gespeicherte Caption.",
+            },
+        )
+
+        assert saved.status_code == 302
+        edit_page = client.get("/edit/1")
+        assert b"Gespeicherte KI-Texte" in edit_page.data
+        assert b"Hook A" in edit_page.data
+        assert b"Hook B" in edit_page.data
+        assert b"Hook C" in edit_page.data
+        assert b"Ein gespeichertes Reel-Skript." in edit_page.data
+        assert b"Eine gespeicherte Caption." in edit_page.data

@@ -33,6 +33,15 @@
 
           <h3>Caption</h3>
           <p>{{ generated.caption }}</p>
+
+          <form action="{{ url_for('save_generated_content', id=idea['id']) }}" method="post" class="form-actions">
+            {% for hook in generated.hooks %}
+              <input type="hidden" name="hooks" value="{{ hook }}">
+            {% endfor %}
+            <input type="hidden" name="script" value="{{ generated.script }}">
+            <input type="hidden" name="caption" value="{{ generated.caption }}">
+            <button type="submit">Diese Hooks &amp; Caption übernehmen</button>
+          </form>
         </section>
       {% endif %}
 

@@ -26,9 +26,32 @@
 
         <div class="form-actions">
           <a href="{{ url_for('index') }}" class="link-button">Zurück</a>
+          <a href="{{ url_for('generate_content', id=idea['id']) }}" class="link-button subtle">Neue KI-Texte</a>
           <button type="submit">Änderungen speichern</button>
         </div>
       </form>
+
+      {% if idea['generated_script'] or idea['generated_caption'] or idea['generated_hooks'] %}
+        <section class="generated-content">
+          <h2>Gespeicherte KI-Texte</h2>
+          {% if saved_hooks %}
+            <h3>Hooks</h3>
+            <ol class="hook-list">
+              {% for hook in saved_hooks %}
+                <li>{{ hook }}</li>
+              {% endfor %}
+            </ol>
+          {% endif %}
+          {% if idea['generated_script'] %}
+            <h3>Reel-Skript</h3>
+            <p class="script-output">{{ idea['generated_script'] }}</p>
+          {% endif %}
+          {% if idea['generated_caption'] %}
+            <h3>Caption</h3>
+            <p>{{ idea['generated_caption'] }}</p>
+          {% endif %}
+        </section>
+      {% endif %}
     </div>
   </body>
 </html>

@@ -90,9 +90,10 @@ def test_category_emoji_is_shown():
         assert b"\xf0\x9f\x93\x9a" in page.data
 
 
-def test_mock_ai_generates_hooks_script_and_caption():
+def test_mock_ai_generates_hooks_script_and_caption(monkeypatch):
     with app.test_client() as client:
         reset_db()
+        monkeypatch.delenv("GEMINI_API_KEY", raising=False)
 
         client.post("/add", data={"title": "Content-Planung", "category": "Education"})
         response = client.post(

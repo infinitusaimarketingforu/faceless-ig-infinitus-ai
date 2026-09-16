@@ -1,5 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for
+import json
+import os
 import sqlite3
+
+from dotenv import load_dotenv
+from flask import Flask, render_template, request, redirect, url_for
+from google import genai
 
 app = Flask(__name__)
 DB_PATH = "ideas.db"
@@ -12,6 +17,8 @@ CATEGORY_EMOJIS = {
     "Lifestyle": "🏡",
     "Allgemein": "🗂️",
 }
+
+load_dotenv()
 
 
 def generate_mock_content(topic, category):
@@ -34,6 +41,47 @@ def generate_mock_content(topic, category):
     }
 
 
+def generate_gemini_content(topic, category, api_key):
+    client = genai.Client(api_key=api_key)
+    prompt = f"""
+Erstelle Instagram-Reel-Inhalte auf Deutsch.
+Thema: {topic}
+
+Kategorie: {category}
+
+Antworte ausschließlich als gültiges JSON mit genau diesen Schlüsseln:
+{{"hooks": ["Hook 1", "Hook 2", "Hook 3"], "script": "Reel-Skript", "caption": "Caption"}}
+Die Liste hooks muss genau drei kurze Vorschläge enthalten.
+"""
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=prompt,
+    )
+    text = response.text.strip()
+    if text.startswith("```"):
+        text = text.removeprefix("```json").removesuffix("```").strip()
+    result = json.loads(text)
+
+    if (
+        not isinstance(result.get("hooks"), list)
+        or len(result["hooks"]) != 3
+        or not result.get("script")
+        or not result.get("caption")
+    ):
+        raise ValueError("Gemini-Antwort hat nicht das erwartete Format.")
+
+    return result
+
+
+def generate_ai_content(topic, category):
+    api_key = os.getenv("GEMINI_API_KEY", "").strip()
+    if not api_key:
+        return generate_mock_content(topic, category)
+
+    try:
+        return generate_gemini_content(topic, category, api_key)
+    except Exception:
+        return generate_mock_content(topic, category)
 def get_db_connection():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
@@ -190,7 +238,7 @@ def generate_content(id):
     generated = None
     if request.method == "POST":
         topic = request.form.get("topic", "").strip() or idea["title"]
-        generated = generate_mock_content(topic, idea["category"])
+        generated = generate_ai_content(topic, idea["category"])
 
     return render_template(
         "generate.html",

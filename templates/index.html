@@ -10,6 +10,31 @@
     <div class="container">
       <h1>Faceless IG Ideen</h1>
 
+      <div class="top-bar">
+        <form action="{{ url_for('index') }}" method="get" class="search-form">
+          <label for="search">Suche</label>
+          <div class="search-row">
+            <input id="search" name="q" type="text" value="{{ search }}" placeholder="z. B. Reels">
+            <button type="submit">Suchen</button>
+          </div>
+        </form>
+
+        <a href="{{ url_for('index') }}" class="link-button">Alle zeigen</a>
+      </div>
+
+      <div class="summary">
+        <div class="summary-card">
+          <span>Gesamt</span>
+          <strong>{{ total_count }}</strong>
+        </div>
+        {% for status, count in status_counts.items() %}
+          <div class="summary-card">
+            <span>{{ status }}</span>
+            <strong>{{ count }}</strong>
+          </div>
+        {% endfor %}
+      </div>
+
       <form action="{{ url_for('add_idea') }}" method="post" class="idea-form">
         <label for="title">Neue Idee</label>
         <div class="input-row">
@@ -21,10 +46,17 @@
       <div class="list">
         {% if ideas %}
           {% for idea in ideas %}
+            {% set badge_class = {
+              'Neu': 'status-neutral',
+              'Geplant': 'status-planned',
+              'Erstellt': 'status-created',
+              'Veröffentlicht': 'status-published'
+            }.get(idea['status'], 'status-neutral') %}
+
             <div class="idea-card">
               <div class="idea-main">
                 <h2>{{ idea['title'] }}</h2>
-                <p>Status: {{ idea['status'] }}</p>
+                <span class="status-badge {{ badge_class }}">{{ idea['status'] }}</span>
               </div>
 
               <form action="{{ url_for('update_status', id=idea['id']) }}" method="post" class="status-form">
@@ -44,7 +76,7 @@
             </div>
           {% endfor %}
         {% else %}
-          <p class="empty">Noch keine Ideen gespeichert.</p>
+          <p class="empty">Keine Ideen gefunden.</p>
         {% endif %}
       </div>
     </div>

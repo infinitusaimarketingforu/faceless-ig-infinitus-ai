@@ -3,6 +3,7 @@ import sqlite3
 
 app = Flask(__name__)
 DB_PATH = "ideas.db"
+STATUS_ORDER = ["Neu", "Geplant", "Erstellt", "Veröffentlicht"]
 
 
 def get_db_connection():
@@ -31,11 +32,33 @@ init_db()
 @app.route("/", methods=["GET"])
 def index():
     conn = get_db_connection()
-    ideas = conn.execute(
-        "SELECT * FROM ideas ORDER BY created_at DESC"
-    ).fetchall()
+    search = request.args.get("q", "").strip()
+
+    if search:
+        query = "SELECT * FROM ideas WHERE title LIKE ? ORDER BY created_at DESC"
+        params = (f"%{search}%",)
+    else:
+        query = "SELECT * FROM ideas ORDER BY created_at DESC"
+        params = ()
+
+    ideas = conn.execute(query, params).fetchall()
+    status_counts = {
+        status: conn.execute(
+            "SELECT COUNT(*) FROM ideas WHERE status = ?",
+            (status,),
+        ).fetchone()[0]
+        for status in STATUS_ORDER
+    }
+    total_count = sum(status_counts.values())
     conn.close()
-    return render_template("index.html", ideas=ideas)
+
+    return render_template(
+        "index.html",
+        ideas=ideas,
+        search=search,
+        total_count=total_count,
+        status_counts=status_counts,
+    )
 
 
 @app.route("/add", methods=["POST"])

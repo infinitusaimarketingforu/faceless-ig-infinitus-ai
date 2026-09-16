@@ -19,7 +19,14 @@
           </div>
         </form>
 
-        <a href="{{ url_for('index') }}" class="link-button">Alle zeigen</a>
+        <div class="filter-actions">
+          <a href="{{ url_for('index') }}" class="link-button">Alle zeigen</a>
+          {% if open_only %}
+            <a href="{{ url_for('index', q=search) }}" class="link-button subtle">Alle anzeigen</a>
+          {% else %}
+            <a href="{{ url_for('index', q=search, open_only=1) }}" class="link-button subtle">Nur offene Ideen</a>
+          {% endif %}
+        </div>
       </div>
 
       <div class="summary">
@@ -45,8 +52,8 @@
       </form>
 
       <div class="list">
-        {% if search and not ideas %}
-          <p class="empty">Keine Einträge gefunden. Bitte passe deine Suche an oder füge einen neuen Eintrag hinzu.</p>
+        {% if (search or open_only) and not ideas %}
+          <p class="empty">Keine Einträge gefunden. Bitte passe deine Suche an, entferne den Filter oder füge einen neuen Eintrag hinzu.</p>
         {% elif ideas %}
           {% for idea in ideas %}
             {% set badge_class = {
@@ -60,7 +67,7 @@
               <div class="idea-main">
                 <h2>{{ idea['title'] }}</h2>
                 <div class="meta-row">
-                  <span class="category-pill">{{ idea['category'] }}</span>
+                  <span class="category-pill">{{ category_emojis.get(idea['category'], '🗂️') }} {{ idea['category'] }}</span>
                   <span class="status-badge {{ badge_class }}">{{ idea['status'] }}</span>
                 </div>
               </div>

@@ -4,6 +4,14 @@ import sqlite3
 app = Flask(__name__)
 DB_PATH = "ideas.db"
 STATUS_ORDER = ["Neu", "Geplant", "Erstellt", "Veröffentlicht"]
+CATEGORY_EMOJIS = {
+    "Education": "📚",
+    "Entertainment": "🎬",
+    "Sales": "💰",
+    "Storytelling": "✨",
+    "Lifestyle": "🏡",
+    "Allgemein": "🗂️",
+}
 
 
 def get_db_connection():
@@ -40,32 +48,32 @@ init_db()
 def index():
     conn = get_db_connection()
     search = request.args.get("q", "").strip()
+    open_only = request.args.get("open_only") == "1"
+
+    where_clauses = []
+    params = []
 
     if search:
-        query = """
-            SELECT * FROM ideas
-            WHERE title LIKE ? OR category LIKE ?
-            ORDER BY CASE status
-                WHEN 'Neu' THEN 0
-                WHEN 'Geplant' THEN 1
-                WHEN 'Erstellt' THEN 2
-                WHEN 'Veröffentlicht' THEN 3
-                ELSE 4
-            END ASC, created_at DESC
-        """
-        params = (f"%{search}%", f"%{search}%")
-    else:
-        query = """
-            SELECT * FROM ideas
-            ORDER BY CASE status
-                WHEN 'Neu' THEN 0
-                WHEN 'Geplant' THEN 1
-                WHEN 'Erstellt' THEN 2
-                WHEN 'Veröffentlicht' THEN 3
-                ELSE 4
-            END ASC, created_at DESC
-        """
-        params = ()
+        where_clauses.append("(title LIKE ? OR category LIKE ?)")
+        params.extend([f"%{search}%", f"%{search}%"])
+
+    if open_only:
+        where_clauses.append("status != ?")
+        params.append("Veröffentlicht")
+
+    query = "SELECT * FROM ideas"
+    if where_clauses:
+        query += " WHERE " + " AND ".join(where_clauses)
+
+    query += """
+        ORDER BY CASE status
+            WHEN 'Neu' THEN 0
+            WHEN 'Geplant' THEN 1
+            WHEN 'Erstellt' THEN 2
+            WHEN 'Veröffentlicht' THEN 3
+            ELSE 4
+        END ASC, created_at DESC
+    """
 
     ideas = conn.execute(query, params).fetchall()
     status_counts = {status: 0 for status in STATUS_ORDER}
@@ -78,8 +86,10 @@ def index():
         "index.html",
         ideas=ideas,
         search=search,
+        open_only=open_only,
         total_count=total_count,
         status_counts=status_counts,
+        category_emojis=CATEGORY_EMOJIS,
     )
 
 

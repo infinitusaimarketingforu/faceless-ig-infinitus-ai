@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mein Free AI Stack Guide — @infinitus.ai.free</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0A0A0F;
+      --surface: #111827;
+      --card: rgba(17, 24, 39, 0.85);
+      --border: rgba(109, 40, 217, 0.35);
+      --violet: #6D28D9;
+      --green: #10B981;
+      --cyan: #22D3EE;
+      --amber: #F59E0B;
+      --text: #F1F5F9;
+      --muted: #94A3B8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(circle at 20% 10%, rgba(109, 40, 217, 0.22), transparent 45%),
+        radial-gradient(circle at 85% 20%, rgba(16, 185, 129, 0.14), transparent 40%),
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: auto, auto, 36px 36px, 36px 36px;
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.6;
+      padding: 40px 20px 72px;
+    }
+
+    .container {
+      max-width: 820px;
+      margin: 0 auto;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--green);
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      padding: 6px 14px;
+      border-radius: 999px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 14px;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+
+    .subtitle strong {
+      color: var(--cyan);
+      font-weight: 600;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px;
+      margin-bottom: 24px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+    }
+
+    .terminal-line {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      color: var(--muted);
+      background: #07070b;
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin-bottom: 22px;
+    }
+
+    .terminal-line span.k {
+      color: var(--cyan);
+      font-weight: 600;
+    }
+
+    .cta-box {
+      background: linear-gradient(135deg, rgba(109, 40, 217, 0.22), rgba(16, 185, 129, 0.14));
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .cta-btn {
+      display: inline-block;
+      margin-top: 14px;
+      background: linear-gradient(135deg, var(--green), #059669);
+      color: #04130d;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      text-decoration: none;
+      padding: 14px 28px;
+      border-radius: 12px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .cta-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+    }
+
+    .meta-row {
+      margin-top: 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--green);
+    }
+
+    h2 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 1.35rem;
+      margin-bottom: 16px;
+      color: var(--text);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.94rem;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 12px 10px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+    }
+
+    th {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--amber);
+      text-transform: uppercase;
+    }
+
+    td:first-child {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--cyan);
+      white-space: nowrap;
+    }
+
+    pre {
+      background: #07070b;
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-radius: 12px;
+      padding: 18px;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: #CBD5E1;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.88rem;
+      margin-top: 32px;
+    }
+
+    footer strong {
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="badge">● LOCAL AI STACK • $0 / MONAT • ZERO API-KEYS</div>
+    <h1>Mein Free AI Stack Guide</h1>
+    <p class="subtitle">Dein $0 Mondschein LLM Setup + Automation mit <strong>Ollama + n8n + Prompts</strong>.</p>
+
+    <div class="card">
+      <div class="terminal-line">
+        <div><span class="k">WHAT:</span> Full Local AI Stack (Ollama + n8n + Prompts)</div>
+        <div><span class="k">WHO:</span> Builder, Creator &amp; Tech-Einsteiger</div>
+        <div><span class="k">WHEN:</span> Sofortiger Zugriff • Lifetime Access</div>
+        <div><span class="k">WHY:</span> 0 € laufende Modell-Kosten • 100 % lokale Kontrolle</div>
+      </div>
+
+      <div class="cta-box">
+        <h2>Dein Freebie herunterladen</h2>
+        <p style="color: var(--muted); font-size: 0.95rem;">
+          Ersetze den Platzhalter-Link im Code durch deine finale Download- oder Landing-URL.
+        </p>
+        <!-- TODO: Finalen Download-Link hier einsetzen -->
+        <a class="cta-btn" href="#FREEBIE_LINK_HIER_EINFUEGEN">Jetzt herunterladen — Free AI Stack Guide</a>
+        <div class="meta-row">✓ Lifetime Access &nbsp;•&nbsp; ✓ Sofort-Zugriff &nbsp;•&nbsp; ✓ Keine Kreditkarte nötig</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Inhalt deines Guides</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Modul</th>
+            <th>Inhalt</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>01 AI SETUP</td>
+            <td>Ollama Installation, Modell-Download &amp; Terminal-Config</td>
+            <td>Setup-Ready</td>
+          </tr>
+          <tr>
+            <td>02 PROMPT BANKS</td>
+            <td>Copy-Paste Prompts für n8n, Obsidian &amp; lokale LLMs</td>
+            <td>Copy-Paste</td>
+          </tr>
+          <tr>
+            <td>03 CHECKLISTS</td>
+            <td>Ollama + n8n Installations-Checkliste &amp; Verifizierung</td>
+            <td>Ops-Check</td>
+          </tr>
+          <tr>
+            <td>04 WORKFLOWS</td>
+            <td>Automatisierungs-Vorlagen (JSON / YAML)</td>
+            <td>Ready-to-Run</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Paket-Struktur</h2>
+      <pre>Free-AI-Stack-Guide/
+├── README.md                 # Schnellstart &amp; Überblick
+├── INSTALL_GUIDE.md          # Schritt-für-Schritt Ollama + n8n
+├── PROMPT_BANK.md            # Prompt-Vorlagen
+├── CHECKLIST_CHECK.json      # Prüf-Checkliste
+└── WORKFLOW_EXAMPLE.yaml     # Beispiel-Workflow</pre>
+    </div>
+
+    <footer>
+      <strong>@infinitus.ai.free</strong> • Lokaler KI-Stack &amp; Automation
+    </footer>
+  </div>
+</body>
+</html>
